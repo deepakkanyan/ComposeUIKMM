@@ -35,7 +35,7 @@ fun App() {
     var selectedTab by remember { mutableStateOf(0) }
     MaterialTheme  {
         Scaffold(
-            topBar = { TopAppBar(title = { Text("$selectedTab") }) },
+            topBar = { TopAppBar(title = { Text("ComposeUI") }) },
 
             bottomBar = {
                 NavigationBar() {
@@ -66,17 +66,15 @@ fun App() {
             }else if(selectedTab == 1){
                 LoginScreen()
             }else {
-
-                var showContent by remember { mutableStateOf(false) }
+                var showContent by remember { mutableStateOf(true) }
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Button(onClick = { showContent = !showContent }) {
                         Text("Click me!")
                     }
                     AnimatedVisibility(showContent) {
-                        val greeting = remember { Greeting().greet() }
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                             Image(painterResource(Res.drawable.compose_multiplatform), null)
-                            Text("Compose: $greeting")
+                            Text("Compose UI")
                         }
                     }
                 }
