@@ -24,8 +24,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.compose_multiplatform
-import org.white.green.firestore.AppAuth
+import org.white.green.login.CreateAccountScreen
 import org.white.green.login.LoginScreen
+import org.white.green.login.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +62,7 @@ fun App() {
         ){
 
             if(selectedTab == 0){
-                Text(AppAuth.testIt())
+                CreateAccountScreen(UserViewModel())
             }else if(selectedTab == 1){
                 LoginScreen()
             }else {

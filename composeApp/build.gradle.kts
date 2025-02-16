@@ -53,7 +53,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.gitlive.firebase.firestore)
             implementation(libs.gitlive.firebase.auth)
-
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.androidx.lifecycle.runtime.ktx)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
