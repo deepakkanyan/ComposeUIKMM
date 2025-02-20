@@ -3,65 +3,79 @@ package org.white.green.login
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.white.green.firestore.AppAuth
 
 
 @Composable
-fun LoginScreen() {
-    var username by remember { mutableStateOf(TextFieldValue()) }
-    var password by remember { mutableStateOf(TextFieldValue()) }
-
+fun LoginScreen(viewModel: LoginViewModel) {
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val isPasswordVisible by viewModel.isPasswordVisible.collectAsState()
+    val isValid by viewModel.isValid.collectAsState()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier = Modifier.fillMaxSize().padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Login", style = MaterialTheme.typography.headlineMedium)
+        Text(text = "Login", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") },
+        OutlinedTextField(
+            value = email,
+            onValueChange = { viewModel.onEmailChange(it) },
+            label = { Text("Email") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextField(
+        OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { viewModel.onPasswordChange(it) },
             label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+            visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
+                    Icon(
+                        imageVector = if (isPasswordVisible) Icons.Default.Person else Icons.Default.Home,
+                        contentDescription = "Toggle Password Visibility"
+                    )
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = {
-               GlobalScope.launch {
-                   AppAuth.login(username.text, password.text).collect{
-                       println(it)
-                   }
-               }
-
-
-            },
+            onClick = { viewModel.login() },
+            enabled = isValid,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Login")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextButton(onClick = { /* Handle forgot password */ }) {
+            Text("Forgot Password?")
+        }
+
+        TextButton(onClick = { /* Handle create account */ }) {
+            Text("Create Account")
         }
     }
 }

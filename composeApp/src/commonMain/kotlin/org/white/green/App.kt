@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +29,7 @@ import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.compose_multiplatform
 import org.white.green.login.CreateAccountScreen
 import org.white.green.login.LoginScreen
+import org.white.green.login.LoginViewModel
 import org.white.green.login.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,22 +42,22 @@ fun App() {
             topBar = { TopAppBar(title = { Text("ComposeUI") }) },
 
             bottomBar = {
-                NavigationBar() {
+                NavigationBar {
                     NavigationBarItem(
-                        icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-                        label = { Text("Home") },
+                        icon = { Icon(Icons.Filled.Person, contentDescription = "Home") },
+                        label = { Text("Profile") },
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 }
                     )
                     NavigationBarItem(
-                        icon = { Icon(Icons.Filled.Call, contentDescription = "Call") },
-                        label = { Text("Call") },
+                        icon = { Icon(Icons.Filled.Favorite, contentDescription = "Match") },
+                        label = { Text("Match") },
                         selected = selectedTab == 1,
                         onClick = { selectedTab = 1 }
                     )
                     NavigationBarItem(
-                        icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
-                        label = { Text("Profile") },
+                        icon = { Icon(Icons.Filled.Face, contentDescription = "Chat") },
+                        label = { Text("Chat") },
                         selected = selectedTab == 2,
                         onClick = { selectedTab = 2 }
                     )
@@ -62,9 +66,9 @@ fun App() {
         ){
 
             if(selectedTab == 0){
-                CreateAccountScreen(UserViewModel())
+                 CreateAccountScreen(UserViewModel())
             }else if(selectedTab == 1){
-                LoginScreen()
+                LoginScreen(LoginViewModel())
             }else {
                 var showContent by remember { mutableStateOf(true) }
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {

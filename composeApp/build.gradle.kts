@@ -30,12 +30,8 @@ kotlin {
             isStatic = true
         }
     }
-    
-    jvm("desktop")
-    
     sourceSets {
-        val desktopMain by getting
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -53,10 +49,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.gitlive.firebase.firestore)
             implementation(libs.gitlive.firebase.auth)
-        }
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.jetbrains.navigation.compose)
         }
     }
 }

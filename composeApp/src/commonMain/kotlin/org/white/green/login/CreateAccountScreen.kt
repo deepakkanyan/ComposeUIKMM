@@ -2,6 +2,7 @@ package org.white.green.login
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -12,7 +13,8 @@ fun CreateAccountScreen(viewModel: UserViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
             value = viewModel.username,
@@ -20,9 +22,7 @@ fun CreateAccountScreen(viewModel: UserViewModel) {
             label = { Text("Username") },
             modifier = Modifier.fillMaxWidth()
         )
-
         Spacer(modifier = Modifier.height(8.dp))
-
         OutlinedTextField(
             value = viewModel.email,
             onValueChange = { viewModel.onEmailChange(it) },
