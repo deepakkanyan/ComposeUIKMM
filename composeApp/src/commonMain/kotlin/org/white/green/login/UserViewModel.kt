@@ -2,6 +2,9 @@ package org.white.green.login
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import org.white.green.firestore.AppAuth
 
 class UserViewModel : ViewModel() {
     var username by mutableStateOf("")
@@ -29,6 +32,9 @@ class UserViewModel : ViewModel() {
     }
 
     fun onSubmit() {
+        viewModelScope.launch {
+            AppAuth.signOut()
+        }
         if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
             successMessage = "✅ Successfully Registered!"
         } else {
