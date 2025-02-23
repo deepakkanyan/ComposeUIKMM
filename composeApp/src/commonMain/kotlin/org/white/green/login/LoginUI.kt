@@ -26,7 +26,7 @@ fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
         email.contains("@") && password.length >= 6
     }
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         viewModel.handleIntent(LoginIntent.CheckLoginStatus)
     }
 
@@ -35,11 +35,10 @@ fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
             val loginState = state as LoginState.IsLoggedIn // Explicit casting
             if (loginState.isLoggedIn) {
                 navController.navigate(AppRoutes.Chat.name) {
-                    popUpTo(AppRoutes.LogIn.name) { inclusive = true } // Remove login screen from back stack
+                    popUpTo(AppRoutes.LogIn.name) {
+                        inclusive = true
+                    } // Remove login screen from back stack
                 }
-            }else{
-
-
             }
         }
     }
@@ -92,20 +91,30 @@ fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextButton(onClick = { /* Handle forgot password */ }) {
-            viewModel.handleIntent(LoginIntent.CheckLoginStatus)
+        TextButton(onClick = {
+
+        }) {
+
             Text("Forgot Password?")
         }
 
-        TextButton(onClick = { /* Handle create account */ }) {
+        TextButton(onClick = { navController.navigate(AppRoutes.SignIn.name) }) {
             Text("Create Account")
         }
 
         // Show login state messages
         when (state) {
             is LoginState.Loading -> CircularProgressIndicator()
-            is LoginState.Success -> Text((state as LoginState.Success).message, color = MaterialTheme.colorScheme.primary)
-            is LoginState.Error -> Text((state as LoginState.Error).errorMessage, color = MaterialTheme.colorScheme.error)
+            is LoginState.Success -> Text(
+                (state as LoginState.Success).message,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            is LoginState.Error -> Text(
+                (state as LoginState.Error).errorMessage,
+                color = MaterialTheme.colorScheme.error
+            )
+
             else -> {} // No action for Idle and Validated states
         }
     }

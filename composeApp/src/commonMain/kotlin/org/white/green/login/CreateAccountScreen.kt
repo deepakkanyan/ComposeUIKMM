@@ -9,6 +9,11 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CreateAccountScreen(viewModel: UserViewModel) {
+    val uiState by viewModel.state.collectAsState()
+    val username by viewModel.username.collectAsState()
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -17,15 +22,17 @@ fun CreateAccountScreen(viewModel: UserViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = viewModel.username,
-            onValueChange = { viewModel.onUsernameChange(it) },
+            value = username,
+            onValueChange = { viewModel.handleIntent(UserIntent.EnterUsername(it)) },
             label = { Text("Username") },
             modifier = Modifier.fillMaxWidth()
         )
+
         Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
-            value = viewModel.email,
-            onValueChange = { viewModel.onEmailChange(it) },
+            value = email,
+            onValueChange = { viewModel.handleIntent(UserIntent.EnterEmail(it)) },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -33,8 +40,8 @@ fun CreateAccountScreen(viewModel: UserViewModel) {
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = viewModel.password,
-            onValueChange = { viewModel.onPasswordChange(it) },
+            value = password,
+            onValueChange = { viewModel.handleIntent(UserIntent.EnterPassword(it)) },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
@@ -43,19 +50,26 @@ fun CreateAccountScreen(viewModel: UserViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { viewModel.onSubmit() },
-            modifier = Modifier.fillMaxWidth()
+            onClick = { viewModel.handleIntent(UserIntent.SubmitRegistration) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = uiState is UserState.Validated && (uiState as UserState.Validated).isValid
         ) {
             Text("Submit")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (viewModel.successMessage.isNotEmpty()) {
-            Text(
-                text = viewModel.successMessage,
-                style = MaterialTheme.typography.bodyMedium
+        when (uiState) {
+            is UserState.Loading -> CircularProgressIndicator()
+            is UserState.Success -> Text(
+                text = (uiState as UserState.Success).message,
+                color = MaterialTheme.colorScheme.primary
             )
+            is UserState.Error -> Text(
+                text = (uiState as UserState.Error).errorMessage,
+                color = MaterialTheme.colorScheme.error
+            )
+            else -> {} // Do nothing for Idle or Validated states
         }
     }
 }

@@ -15,7 +15,6 @@ class LoginViewModel : ViewModel() {
     val state: StateFlow<LoginState> = _state
 
 
-
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email
 

@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
@@ -29,11 +30,26 @@ import org.white.green.login.UserViewModel
 @Composable
 fun App() {
     val navController = rememberNavController()
-    WhiteGreenTheme(true){
-        Scaffold(
-            topBar = { TopAppBar(title = { Text("White Green") }) },
-            bottomBar = { BottomNavigationBar(navController) }
-        ) { paddingValues ->
+    WhiteGreenTheme(true) {
+        Scaffold(topBar = {
+            TopAppBar(title = {
+                Text("White Green")
+            }, navigationIcon = {
+
+                IconButton(onClick = {
+                    navController.popBackStack()
+                }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+
+            }
+
+
+            )
+        }, bottomBar = { BottomNavigationBar(navController) }) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
                 AppNavHost(navController)
             }
@@ -54,8 +70,7 @@ fun BottomNavigationBar(navController: NavHostController) {
 
     NavigationBar {
         items.forEach { item ->
-            NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.label) },
+            NavigationBarItem(icon = { Icon(item.icon, contentDescription = item.label) },
                 label = { Text(item.label) },
                 selected = currentRoute == item.route,
                 onClick = {
@@ -66,8 +81,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
-            )
+                })
         }
     }
 }
@@ -98,8 +112,7 @@ fun AppNavHost(navController: NavHostController) {
 @Composable
 fun ProfileScreen(navController: NavHostController) {
     Column(
-        Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(painterResource(Res.drawable.compose_multiplatform), null)
         Text("Profile Page")
@@ -112,8 +125,7 @@ fun ProfileScreen(navController: NavHostController) {
 @Composable
 fun ChangeProfilePicScreen(navController: NavHostController) {
     Column(
-        Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Change Profile Picture")
         Button(onClick = { navController.navigate(AppRoutes.SignIn.name) }) {
@@ -131,16 +143,16 @@ fun ChangeProfileBasicInfoScreen() {
 fun ChatScreen() {
     var showContent by remember { mutableStateOf(true) }
     Column(
-        Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Button(onClick = { showContent = !showContent }) {
+        Button(onClick = {
+            showContent = !showContent
+        }) {
             Text("Click me!")
         }
         AnimatedVisibility(showContent) {
             Column(
-                Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(painterResource(Res.drawable.compose_multiplatform), null)
                 Text("Compose UI")
@@ -149,10 +161,12 @@ fun ChatScreen() {
     }
 }
 
-data class BottomNavItem(val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector, val route: String)
+data class BottomNavItem(
+    val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector, val route: String
+)
 
 @Composable
 fun currentRoute(navController: NavHostController): String? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.destination?.route
+    return rememberUpdatedState(newValue = navBackStackEntry?.destination?.route).value
 }
