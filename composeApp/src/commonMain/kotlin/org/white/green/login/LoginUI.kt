@@ -14,10 +14,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import org.white.green.AppRoutes
+import org.white.green.AppRoute
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
+fun LoginScreen(viewModel: LoginViewModel, navController: NavController, onLogIn: () -> Unit) {
     val state by viewModel.state.collectAsState()
     val email by remember { viewModel.email }.collectAsState()
     val password by remember { viewModel.password }.collectAsState()
@@ -30,19 +30,20 @@ fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
         viewModel.handleIntent(LoginIntent.CheckLoginStatus)
     }
 
-    LaunchedEffect(state) { // Observe the actual value of StateFlow
+    LaunchedEffect(state) {
         if (state is LoginState.IsLoggedIn) {
             val loginState = state as LoginState.IsLoggedIn // Explicit casting
             if (loginState.isLoggedIn) {
-                navController.navigate(AppRoutes.Chat.name) {
-                    popUpTo(AppRoutes.LogIn.name) {
+                navController.navigate(AppRoute.ProfileBasicInfo) {
+                    popUpTo(AppRoute.LogIn) {
                         inclusive = true
-                    } // Remove login screen from back stack
+                    }
                 }
             }
+        }else if (state is LoginState.Success){
+            onLogIn()
         }
     }
-
 
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -98,7 +99,7 @@ fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
             Text("Forgot Password?")
         }
 
-        TextButton(onClick = { navController.navigate(AppRoutes.SignIn.name) }) {
+        TextButton(onClick = { navController.navigate(AppRoute.SignIn) }) {
             Text("Create Account")
         }
 

@@ -1,14 +1,13 @@
 package org.white.green.login
-
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.white.green.base.BaseViewModel
 import org.white.green.firestore.AppAuth
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel : BaseViewModel() {
 
     // UI State Flow (single source of truth)
     private val _state = MutableStateFlow<LoginState>(LoginState.Idle)
