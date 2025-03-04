@@ -6,38 +6,31 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import org.jetbrains.compose.resources.painterResource
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.compose_multiplatform
-import org.white.green.login.CreateAccountScreen
-import org.white.green.login.LoginScreen
-import org.white.green.login.LoginViewModel
-import org.white.green.login.UserViewModel
-import org.white.green.profile.ProfileUI
-import org.white.green.profile.ProfileViewModel
-
+import org.white.green.login.*
+import org.white.green.profile.*
+import org.white.green.profile.ui.preferences.PreferencesForm
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
     val navController = rememberNavController()
-    val appStartupViewModel = AppStartupViewModel()
+    val appStartupViewModel = remember { AppStartupViewModel() }
     val isLoggedIn by appStartupViewModel.isLoggedIn.collectAsState()
 
-    LaunchedEffect(isLoggedIn) {
+    LaunchedEffect(Unit) {
         if (isLoggedIn) {
             navController.navigate(AppRoute.ProfileBasicInfo.route) {
                 popUpTo(AppRoute.LogIn.route) { inclusive = true }
@@ -47,36 +40,52 @@ fun App() {
 
     WhiteGreenTheme(false) {
         Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.systemBars),
+            modifier = Modifier.fillMaxSize(),
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            bottomBar = {
-                if (isLoggedIn) BottomNavigationBar(navController)
-            }
-
+            topBar = { TopNavigationBar(navController) },
+            bottomBar = { if (isLoggedIn) BottomNavigationBar(navController) }
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
+                println("My Nav host is rendering")
                 AppNavHost(appStartupViewModel, navController)
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopNavigationBar(navController: NavHostController) {
+    val currentRoute = currentRoute(navController)
+    val bottomNavRoutes = listOf(
+        AppRoute.MainProfileDashboard.route,
+        AppRoute.Chat.route,
+        AppRoute.ProfileBasicInfo.route,
+        AppRoute.LogIn.route
+    )
+    if (currentRoute !in bottomNavRoutes) {
+        TopAppBar(
+            title = { Text(AppRoute.getRouteTitle(currentRoute ?: "")) },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+            }
+        )
+    }
+}
+
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
-        BottomNavItem(Strings.signIn, Icons.Filled.Person, AppRoute.MainProfileDashboard.route),
+        BottomNavItem(AppRoute.MainProfileDashboard.route, Icons.Filled.Person, AppRoute.MainProfileDashboard.route),
         BottomNavItem(Strings.profile, Icons.Filled.Favorite, AppRoute.MainProfileDashboard.route),
         BottomNavItem(Strings.chat, Icons.Filled.Face, AppRoute.Chat.route),
         BottomNavItem(Strings.advertising, Icons.Filled.AddCircle, AppRoute.ProfileBasicInfo.route)
     )
-    val currentRoute = currentRoute(navController)
+    val currentRoute =   currentRoute(navController)
 
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.background
-
-    ) {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.background) {
         items.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.label) },
@@ -111,18 +120,30 @@ fun AppNavHost(appStartupViewModel: AppStartupViewModel, navController: NavHostC
         composable(AppRoute.ChangeProfilePic.route) { ChangeProfilePicScreen(navController) }
         composable(AppRoute.ChangeProfileBasicInfo.route) { ChangeProfileBasicInfoScreen() }
         composable(AppRoute.Chat.route) { ChatScreen() }
-        composable(AppRoute.ProfileBasicInfo.route) {
-            ProfileUI(navController, ProfileViewModel()) {
-                appStartupViewModel.logout()
-                navController.navigate(AppRoute.LogIn.route)
-            }
+        profileComposable(appStartupViewModel, navController)
+    }
+}
+
+fun NavGraphBuilder.profileComposable(
+    appStartupViewModel: AppStartupViewModel,
+    navController: NavHostController
+) {
+    println("profileComposable")
+    composable(AppRoute.ProfileBasicInfo.route) {
+        println("profileComposable ${AppRoute.ProfileBasicInfo.route}")
+        ProfileUI(navController) {
+            appStartupViewModel.logout()
+            navController.navigate(AppRoute.LogIn.route)
         }
+    }
+    composable(AppRoute.ProfilePreferences.route) {
+        PreferencesForm { data -> println(data) }
     }
 }
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Image(painterResource(Res.drawable.compose_multiplatform), null)
         Text("Profile Page")
         Button(onClick = { navController.navigate(AppRoute.ChangeProfilePic.route) }) {
@@ -133,7 +154,7 @@ fun ProfileScreen(navController: NavHostController) {
 
 @Composable
 fun ChangeProfilePicScreen(navController: NavHostController) {
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text("Change Profile Picture")
         Button(onClick = { navController.navigate(AppRoute.SignIn.route) }) {
             Text("Save Profile Pic")
@@ -149,10 +170,10 @@ fun ChangeProfileBasicInfoScreen() {
 @Composable
 fun ChatScreen() {
     var showContent by remember { mutableStateOf(true) }
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Button(onClick = { showContent = !showContent }) { Text("Click me!") }
         AnimatedVisibility(showContent) {
-            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(painterResource(Res.drawable.compose_multiplatform), null)
                 Text("Compose UI")
             }
@@ -170,17 +191,13 @@ fun currentRoute(navController: NavHostController): String? {
 
 fun navigateToRoute(navController: NavHostController, route: String) {
     navController.navigate(route) {
-        popUpTo(navController.graph.findStartDestination().id) {
-            saveState = true
-        }
+        popUpTo(navController.graph.startDestinationId) { saveState = true }
         launchSingleTop = true
         restoreState = true
     }
 }
 
 object Strings {
-    const val appName = "White Green"
-    const val back = "Back"
     const val signIn = "Sign In"
     const val profile = "Profile"
     const val chat = "Chat"

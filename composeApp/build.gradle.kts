@@ -1,4 +1,3 @@
-import com.android.tools.r8.internal.im
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -8,8 +7,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-
     id("com.google.gms.google-services")
+    id("kotlinx-serialization")
 }
 
 kotlin {
@@ -51,7 +50,9 @@ kotlin {
             implementation(libs.gitlive.firebase.auth)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.jetbrains.navigation.compose)
-            implementation (libs.accompanist.systemuicontroller)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.kotlinx.serialization.json)
+            implementation (libs.material.icons)
         }
     }
 }
