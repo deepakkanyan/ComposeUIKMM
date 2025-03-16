@@ -1,34 +1,33 @@
 package org.white.green.profile.cards
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.unit.dp
-import org.white.green.profile.ProfileRow
-import org.white.green.profile.UIState
-import org.white.green.profile.data.ProfileModel
+import org.white.green.designSystem.ui.duel.LeftRightInfoView
+import org.white.green.designSystem.ui.duel.TitleWithRightIcon
+import org.white.green.designSystem.ui.global.GlobalCardView
+import org.white.green.designSystem.ui.helper.noRippleClickable
+import org.white.green.designSystem.ui.ui_state.UIState
+import org.white.green.profile.ui.basicProfile.BasicProfileModel
+import spacing
 
 @Composable
-fun ProfileCard(profileState: UIState<ProfileModel>) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(6.dp),
-        elevation = CardDefaults.cardElevation(1.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
-    ) {
+fun ProfileCard(profileState: UIState<BasicProfileModel>, onClick: () -> Unit) {
+    GlobalCardView {
         when (profileState) {
             is UIState.Loading -> {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
+                        .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -38,33 +37,25 @@ fun ProfileCard(profileState: UIState<ProfileModel>) {
             is UIState.Success -> {
                 val profile = profileState.data
                 Column(
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier.noRippleClickable {
+                        onClick.invoke()
+                    },
                     horizontalAlignment = Alignment.Start
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(profile.fullName)
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = "edit",
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.alpha(0.5f)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(22.dp))
-                    ProfileRow("Email", profile.email)
-                    Spacer(modifier = Modifier.height(22.dp))
-                    ProfileRow("Phone", profile.phoneNumber)
+                    TitleWithRightIcon(profile.name)
+                    Spacer(modifier = Modifier.height(spacing.large))
+                    LeftRightInfoView("Email", profile.email)
+                    Spacer(modifier = Modifier.height(spacing.large))
+                    LeftRightInfoView("Phone", profile.phone)
+                    Spacer(modifier = Modifier.height(spacing.large))
+                    LeftRightInfoView("Bio", profile.bio)
                 }
             }
 
             is UIState.Error -> {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {

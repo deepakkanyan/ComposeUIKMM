@@ -46,13 +46,27 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+
             implementation(libs.gitlive.firebase.firestore)
             implementation(libs.gitlive.firebase.auth)
+            implementation(libs.gitlive.firebase.storage)
+
+
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.jetbrains.navigation.compose)
             implementation(libs.androidx.core.ktx)
             implementation(libs.kotlinx.serialization.json)
             implementation (libs.material.icons)
+            implementation(compose.materialIconsExtended)
+
+            //Koin
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+
+            //Datetime
+            implementation(libs.kotlinx.datetime)
+
         }
     }
 }
@@ -86,6 +100,7 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    implementation(libs.ui.tooling.preview)
 }
 
 compose.desktop {

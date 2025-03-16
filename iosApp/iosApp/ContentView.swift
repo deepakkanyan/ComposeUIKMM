@@ -5,7 +5,10 @@ import ComposeApp
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.MainViewController()
+        let uiController = UINavigationController( rootViewController: MainViewControllerKt.MainViewController())
+        uiController.interactivePopGestureRecognizer?.isEnabled = true
+        uiController.isNavigationBarHidden = true
+        return uiController
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
@@ -14,9 +17,10 @@ struct ComposeView: UIViewControllerRepresentable {
 struct ContentView: View {
     var body: some View {
         ComposeView()
-                .ignoresSafeArea(.keyboard) // Compose has own keyboard handler
+                .ignoresSafeArea(.keyboard)
+                .frame(maxHeight: .infinity)
+                .ignoresSafeArea(.all, edges: .all)
     }
 }
-
 
 

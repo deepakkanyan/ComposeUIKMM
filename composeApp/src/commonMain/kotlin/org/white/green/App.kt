@@ -1,42 +1,56 @@
 package org.white.green
 
 import WhiteGreenTheme
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ChatBubble
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.*
-import org.jetbrains.compose.resources.painterResource
-import kotlinproject.composeapp.generated.resources.Res
-import kotlinproject.composeapp.generated.resources.compose_multiplatform
-import org.white.green.login.*
-import org.white.green.profile.*
-import org.white.green.profile.ui.preferences.PreferencesForm
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.delay
+import org.white.green.chat.ChatUI
+import org.white.green.developer.ColorListScreen
+import org.white.green.login.CreateAccountScreen
+import org.white.green.login.LoginScreen
+import org.white.green.login.UserViewModel
+import org.white.green.profile.ProfileUI
+import org.white.green.profile.ui.basicProfile.BasicProfileForm
+import org.white.green.profile.ui.family.FamilyForm
+import org.white.green.profile.ui.personal.PreferencesForm
+import spacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
     val navController = rememberNavController()
     val appStartupViewModel = remember { AppStartupViewModel() }
     val isLoggedIn by appStartupViewModel.isLoggedIn.collectAsState()
 
-    LaunchedEffect(Unit) {
-        if (isLoggedIn) {
-            navController.navigate(AppRoute.ProfileBasicInfo.route) {
-                popUpTo(AppRoute.LogIn.route) { inclusive = true }
-            }
-        }
-    }
 
     WhiteGreenTheme(false) {
         Scaffold(
@@ -46,8 +60,21 @@ fun App() {
             bottomBar = { if (isLoggedIn) BottomNavigationBar(navController) }
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
-                println("My Nav host is rendering")
-                AppNavHost(appStartupViewModel, navController)
+                AppNavHost(appStartupViewModel, navController) {
+                    // Login success
+                    appStartupViewModel.observeAuthChanges()
+                    navController.navigate(AppRoute.ProfileBasicInfo.route) {
+                        popUpTo(AppRoute.LogInRoute.route) { inclusive = true }
+                    }
+                }
+            }
+        }
+    }
+    LaunchedEffect(Unit) {
+        if (isLoggedIn) {
+            delay(10)
+            navController.navigate(AppRoute.ProfileBasicInfo.route) {
+                popUpTo(AppRoute.LogInRoute.route) { inclusive = true }
             }
         }
     }
@@ -61,16 +88,26 @@ fun TopNavigationBar(navController: NavHostController) {
         AppRoute.MainProfileDashboard.route,
         AppRoute.Chat.route,
         AppRoute.ProfileBasicInfo.route,
-        AppRoute.LogIn.route
+        AppRoute.LogInRoute.route
     )
     if (currentRoute !in bottomNavRoutes) {
         TopAppBar(
-            title = { Text(AppRoute.getRouteTitle(currentRoute ?: "")) },
+            title = {
+                Text(
+                    AppRoute.getRouteTitle(currentRoute ?: ""),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            },
             navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
-            }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,  // Background color
+                titleContentColor = MaterialTheme.colorScheme.onPrimary, // Text color
+                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+            )
         )
     }
 }
@@ -78,12 +115,11 @@ fun TopNavigationBar(navController: NavHostController) {
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
-        BottomNavItem(AppRoute.MainProfileDashboard.route, Icons.Filled.Person, AppRoute.MainProfileDashboard.route),
-        BottomNavItem(Strings.profile, Icons.Filled.Favorite, AppRoute.MainProfileDashboard.route),
-        BottomNavItem(Strings.chat, Icons.Filled.Face, AppRoute.Chat.route),
-        BottomNavItem(Strings.advertising, Icons.Filled.AddCircle, AppRoute.ProfileBasicInfo.route)
+        BottomNavItem(Strings.chat, Icons.Filled.ChatBubble, AppRoute.Chat.route),
+        BottomNavItem(Strings.match, Icons.Filled.Favorite, AppRoute.ColorUI.route),
+        BottomNavItem(Strings.profile, Icons.Filled.AccountCircle, AppRoute.ProfileBasicInfo.route),
     )
-    val currentRoute =   currentRoute(navController)
+    val currentRoute = currentRoute(navController)
 
     NavigationBar(containerColor = MaterialTheme.colorScheme.background) {
         items.forEach { item ->
@@ -98,29 +134,31 @@ fun BottomNavigationBar(navController: NavHostController) {
 }
 
 @Composable
-fun AppNavHost(appStartupViewModel: AppStartupViewModel, navController: NavHostController) {
+fun AppNavHost(
+    appStartupViewModel: AppStartupViewModel,
+    navController: NavHostController,
+    onLogin: () -> Unit
+) {
     NavHost(
         navController = navController,
-        startDestination = AppRoute.LogIn.route,
-        modifier = Modifier.padding(16.dp)
+        startDestination = AppRoute.LogInRoute.route,
+        modifier = Modifier.padding(spacing.large)
     ) {
         composable(AppRoute.SignIn.route) { CreateAccountScreen(viewModel = UserViewModel()) }
-        composable(AppRoute.LogIn.route) {
-            LoginScreen(viewModel = LoginViewModel(), navController) {
-                appStartupViewModel.observeAuthChanges()
+        composable(AppRoute.LogInRoute.route) {
+            LoginScreen(navController) {
+                onLogin.invoke()
             }
         }
         composable(AppRoute.ForgotPassword.route) {
-            LoginScreen(viewModel = LoginViewModel(), navController) {
-                appStartupViewModel.observeAuthChanges()
+            LoginScreen(navController) {
+                onLogin.invoke()
                 navController.navigate(AppRoute.ProfileBasicInfo.route)
             }
         }
-        composable(AppRoute.MainProfileDashboard.route) { ProfileScreen(navController) }
-        composable(AppRoute.ChangeProfilePic.route) { ChangeProfilePicScreen(navController) }
-        composable(AppRoute.ChangeProfileBasicInfo.route) { ChangeProfileBasicInfoScreen() }
-        composable(AppRoute.Chat.route) { ChatScreen() }
+        composable(AppRoute.Chat.route) { ChatUI() }
         profileComposable(appStartupViewModel, navController)
+        composable(AppRoute.ColorUI.route) { ColorListScreen() }
     }
 }
 
@@ -128,56 +166,20 @@ fun NavGraphBuilder.profileComposable(
     appStartupViewModel: AppStartupViewModel,
     navController: NavHostController
 ) {
-    println("profileComposable")
     composable(AppRoute.ProfileBasicInfo.route) {
-        println("profileComposable ${AppRoute.ProfileBasicInfo.route}")
-        ProfileUI(navController) {
+        ProfileUI(navController = navController) {
             appStartupViewModel.logout()
-            navController.navigate(AppRoute.LogIn.route)
+            navController.navigate(AppRoute.LogInRoute.route)
         }
     }
     composable(AppRoute.ProfilePreferences.route) {
-        PreferencesForm { data -> println(data) }
+        PreferencesForm()
     }
-}
-
-@Composable
-fun ProfileScreen(navController: NavHostController) {
-    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Image(painterResource(Res.drawable.compose_multiplatform), null)
-        Text("Profile Page")
-        Button(onClick = { navController.navigate(AppRoute.ChangeProfilePic.route) }) {
-            Text("Change Profile Pic")
-        }
+    composable(AppRoute.ProfileEditFamily.route) {
+        FamilyForm()
     }
-}
-
-@Composable
-fun ChangeProfilePicScreen(navController: NavHostController) {
-    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Change Profile Picture")
-        Button(onClick = { navController.navigate(AppRoute.SignIn.route) }) {
-            Text("Save Profile Pic")
-        }
-    }
-}
-
-@Composable
-fun ChangeProfileBasicInfoScreen() {
-    Text("Profile Basic Info")
-}
-
-@Composable
-fun ChatScreen() {
-    var showContent by remember { mutableStateOf(true) }
-    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Button(onClick = { showContent = !showContent }) { Text("Click me!") }
-        AnimatedVisibility(showContent) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(painterResource(Res.drawable.compose_multiplatform), null)
-                Text("Compose UI")
-            }
-        }
+    composable(AppRoute.ProfileEditInfo.route) {
+        BasicProfileForm()
     }
 }
 
@@ -198,9 +200,8 @@ fun navigateToRoute(navController: NavHostController, route: String) {
 }
 
 object Strings {
-    const val signIn = "Sign In"
+    const val dashboard = "Dashboard"
     const val profile = "Profile"
     const val chat = "Chat"
-    const val advertising = "Advertising"
+    const val match = "Match"
 }
-

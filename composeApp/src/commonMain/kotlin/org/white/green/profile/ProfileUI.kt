@@ -1,13 +1,13 @@
 package org.white.green.profile
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,59 +16,74 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
+import org.koin.compose.viewmodel.koinViewModel
+import org.white.green.AppRoute
 import org.white.green.profile.cards.PreferencesCard
+import org.white.green.profile.cards.ProfessionCard
 import org.white.green.profile.cards.ProfileCard
+import spacing
 
 @Composable
-fun ProfileUI(navController: NavController, onLogout: () -> Unit) {
-    val viewModel: ProfileViewModel = remember { ProfileViewModel() }
-
+fun ProfileUI(
+    viewModel: ProfileViewModel = koinViewModel(),
+    navController: NavController,
+    onLogout: () -> Unit
+) {
     //States
     val profileState by viewModel.profileState.collectAsState()
     val preferencesState by viewModel.preferencesState.collectAsState()
+    val familyState by viewModel.familyState.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.processIntent(ProfileViewModel.ProfileIntent.FetchProfile)
-        viewModel.processIntent(ProfileViewModel.ProfileIntent.FetchPreferences)
+    val scrollState = rememberScrollState()
+
+    // Refresh when returning
+    LaunchedEffect(navController.currentBackStackEntry) {
+        viewModel.fetchFamily()
+        viewModel.fetchPreferences()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column {
-            ProfileCard(profileState)
-            Spacer(Modifier.padding(10.dp))
+        Column(modifier = Modifier.verticalScroll(scrollState)) {
+            ProfileCard(profileState){
+                navController.navigate(AppRoute.ProfileEditInfo.route)
+            }
+            Spacer(Modifier.padding(spacing.medium))
             PreferencesCard(
                 preferencesState = preferencesState,
-                navController = navController,
-                onRetry = { viewModel.processIntent(ProfileViewModel.ProfileIntent.FetchPreferences) }
+                onClick = { navController.navigate(AppRoute.ProfilePreferences.route) },
+                onRetry = { viewModel.fetchPreferences() }
             )
+            Spacer(Modifier.padding(spacing.medium))
+            ProfessionCard(familyState,
+                onRetry = {
+                    viewModel.fetchFamily()
+                }, onClick = {
+                    navController.navigate(AppRoute.ProfileEditFamily.route)
+                })
 
             TextButton(
                 onClick = {
-                    viewModel.processIntent(ProfileViewModel.ProfileIntent.FetchPreferences)
+                    onLogout.invoke()
                 },
                 colors = ButtonDefaults.textButtonColors(contentColor = Color.Red),
                 modifier = Modifier.fillMaxWidth()
+                    .padding(vertical = spacing.extraLarge)
             ) {
                 Text("Logout")
             }
 
-        }
-    }
-}
+            Text(
+                "Made with ❤️",
+                style = MaterialTheme.typography.labelSmall,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.fillMaxWidth().padding(spacing.medium)
+            )
 
-/** Profile Row */
-@Composable
-fun ProfileRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = label, style = MaterialTheme.typography.labelSmall)
-        Text(text = value, color = MaterialTheme.colorScheme.primary)
+        }
     }
 }

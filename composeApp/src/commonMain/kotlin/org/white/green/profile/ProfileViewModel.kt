@@ -2,82 +2,72 @@ package org.white.green.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.white.green.firestore.ProfileAuth
-import org.white.green.profile.data.ProfileModel
-import org.white.green.profile.ui.preferences.PreferencesModel
-import org.white.green.profile.ui.preferences.PreferencesRepository
+import org.white.green.designSystem.ui.ui_state.UIState
+import org.white.green.profile.ui.basicProfile.BasicProfileModel
+import org.white.green.profile.ui.basicProfile.BasicProfileRepository
+import org.white.green.profile.ui.family.FamilyInfoModel
+import org.white.green.profile.ui.family.FamilyRepository
+import org.white.green.profile.ui.personal.PersonalModel
+import org.white.green.profile.ui.personal.PersonalRepository
 
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel(
+    private val personalRepo: PersonalRepository,
+    private val familyRepo: FamilyRepository,
+    private val profileRepo: BasicProfileRepository
+) : ViewModel() {
 
-    private val _profileState = MutableStateFlow<UIState<ProfileModel>>(UIState.Loading)
-    val profileState: StateFlow<UIState<ProfileModel>> = _profileState.asStateFlow()
+    private val _profileState = MutableStateFlow<UIState<BasicProfileModel>>(UIState.Loading)
+    val profileState: StateFlow<UIState<BasicProfileModel>> = _profileState.asStateFlow()
 
-    private val _preferencesState = MutableStateFlow<UIState<PreferencesModel>>(UIState.Loading)
-    val preferencesState: StateFlow<UIState<PreferencesModel>> = _preferencesState.asStateFlow()
+    private val _preferencesState = MutableStateFlow<UIState<PersonalModel>>(UIState.Loading)
+    val preferencesState: StateFlow<UIState<PersonalModel>> = _preferencesState.asStateFlow()
+
+    private val _familyState = MutableStateFlow<UIState<FamilyInfoModel>>(UIState.Loading)
+    val familyState: StateFlow<UIState<FamilyInfoModel>> = _familyState.asStateFlow()
 
 
-    fun processIntent(intent: ProfileIntent) {
-        when (intent) {
-            is ProfileIntent.FetchProfile -> fetchProfile()
-            is ProfileIntent.SaveProfile -> saveProfile(intent.profile)
-            is ProfileIntent.FetchPreferences -> fetchPreferences()
-        }
+    init {
+        fetchProfile()
+        fetchPreferences()
+        fetchFamily()
     }
 
     private fun fetchProfile() {
         viewModelScope.launch {
             _profileState.value = UIState.Loading
             try {
-                val profileData = ProfileAuth.fetchProfileFromFirestore()
-                _profileState.value = UIState.Success(profileData)
+                val profileData = profileRepo.fetch()
+                _profileState.value = UIState.Success(profileData.getOrThrow())
             } catch (e: Exception) {
                 _profileState.value = UIState.Error(e.message ?: "Unknown error")
             }
         }
     }
 
-    private fun fetchPreferences() {
+    fun fetchPreferences() {
         viewModelScope.launch {
             try {
-                val profileData = PreferencesRepository().fetchPreferences()
+                val profileData = personalRepo.fetchPreferences()
                 _preferencesState.value = UIState.Success(profileData.getOrThrow())
             } catch (e: Exception) {
-                println(e.message)
-                _preferencesState.value = UIState.Error(e.message ?: "Unknown error")
+                   _preferencesState.value = UIState.Error(e.message ?: "Unknown error")
             }
         }
     }
 
-    private fun saveProfile(profile: ProfileModel) {
+    fun fetchFamily() {
         viewModelScope.launch {
             try {
-                ProfileAuth.saveProfile(
-                    firstName = profile.firstName,
-                    lastName = profile.lastName,
-                    email = profile.email,
-                    phoneNumber = profile.phoneNumber
-                )
-
+                val profileData = familyRepo.fetch()
+                _familyState.value = UIState.Success(profileData.getOrThrow())
             } catch (e: Exception) {
-                _profileState.value = UIState.Error(e.message ?: "Save failed")
+                println(e.message)
+                _familyState.value = UIState.Error(e.message ?: "Unknown error")
             }
         }
     }
-
-    // Profile Intent
-    sealed class ProfileIntent {
-        data object FetchProfile : ProfileIntent()
-        data class SaveProfile(val profile: ProfileModel) : ProfileIntent()
-        data object FetchPreferences : ProfileIntent()
-    }
 }
-
-
-sealed class UIState<out T> {
-    data object Loading : UIState<Nothing>()
-    data class Success<T>(val data: T) : UIState<T>()
-    data class Error(val message: String) : UIState<Nothing>()
-}
-

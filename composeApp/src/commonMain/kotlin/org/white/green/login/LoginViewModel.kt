@@ -2,6 +2,7 @@ package org.white.green.login
 import androidx.lifecycle.viewModelScope
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.white.green.base.BaseViewModel
@@ -68,6 +69,7 @@ class LoginViewModel : BaseViewModel() {
 
     private fun isLoggedIn() {
         viewModelScope.launch {
+            delay(1000)
             println("ss ${Firebase.auth.currentUser} ")
             AppAuth.isUserLoggedIn().collect { result ->
                 println("SpK ${result}")
@@ -85,12 +87,6 @@ class LoginViewModel : BaseViewModel() {
             } catch (e: Exception) {
                 _state.value = LoginState.Error("Error: ${e.message}")
             }
-        }
-    }
-
-    fun signOut(){
-        viewModelScope.launch {
-            AppAuth.signOut()
         }
     }
 }
@@ -114,7 +110,3 @@ sealed class LoginState {
     data class Error(val errorMessage: String) : LoginState()
 }
 
-// UI Event for Single-use Actions
-sealed class LoginEvent {
-    data class ShowToast(val message: String) : LoginEvent()
-}
