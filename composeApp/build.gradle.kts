@@ -35,6 +35,10 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.accompanist.permissions)
+            implementation(libs.koin.android) // Ensure this is added
+            implementation(libs.androidx.activity)
+
 
         }
         commonMain.dependencies {

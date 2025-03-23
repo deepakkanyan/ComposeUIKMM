@@ -2,6 +2,7 @@ package org.white.green.designSystem.ui.duel
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +19,7 @@ fun LeftRightInfoView(label: String, value: String) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = label, style = MaterialTheme.typography.labelMedium)
+        Spacer(Modifier.padding(end = spacing.dimen32))
         Text(
             text = value,
             color = MaterialTheme.colorScheme.tertiary,

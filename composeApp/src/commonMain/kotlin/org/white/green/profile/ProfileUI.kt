@@ -48,9 +48,11 @@ fun ProfileUI(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.verticalScroll(scrollState)) {
-            ProfileCard(profileState){
+            ProfileCard(profileState, onClick = {
                 navController.navigate(AppRoute.ProfileEditInfo.route)
-            }
+            }, onRetry = {
+
+            })
             Spacer(Modifier.padding(spacing.medium))
             PreferencesCard(
                 preferencesState = preferencesState,

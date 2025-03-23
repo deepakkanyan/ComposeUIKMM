@@ -35,10 +35,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 import org.white.green.chat.ChatUI
-import org.white.green.developer.ColorListScreen
 import org.white.green.login.CreateAccountScreen
 import org.white.green.login.LoginScreen
 import org.white.green.login.UserViewModel
+import org.white.green.match.MatchUI
 import org.white.green.profile.ProfileUI
 import org.white.green.profile.ui.basicProfile.BasicProfileForm
 import org.white.green.profile.ui.family.FamilyForm
@@ -158,7 +158,7 @@ fun AppNavHost(
         }
         composable(AppRoute.Chat.route) { ChatUI() }
         profileComposable(appStartupViewModel, navController)
-        composable(AppRoute.ColorUI.route) { ColorListScreen() }
+        composable(AppRoute.ColorUI.route) { MatchUI() }
     }
 }
 

@@ -12,6 +12,7 @@ import org.white.green.designSystem.ui.duel.LeftRightInfoView
 import org.white.green.designSystem.ui.duel.TitleWithRightIcon
 import org.white.green.designSystem.ui.global.GlobalCardView
 import org.white.green.designSystem.ui.helper.noRippleClickable
+import org.white.green.designSystem.ui.ui_state.ErrorUI
 import org.white.green.designSystem.ui.ui_state.UIState
 import org.white.green.profile.ui.family.FamilyInfoModel
 import spacing
@@ -28,7 +29,10 @@ fun ProfessionCard(
         }
 
         is UIState.Error -> {
-            Text("Error loading family info")
+
+            ErrorUI({
+                TitleWithRightIcon(leftIcon = Icons.Rounded.Groups, title = "Family"){ onClick.invoke()}
+            }, familyInfoModel.error, onRetry = onRetry)
         }
 
         is UIState.Success -> {
@@ -42,7 +46,7 @@ fun ProfessionCard(
 private fun FamilyCard(model: FamilyInfoModel, onClick: () -> Unit) {
     GlobalCardView {
         Column(modifier = Modifier.noRippleClickable { onClick.invoke() }) {
-            TitleWithRightIcon(leftIcon = Icons.Rounded.Groups, title = "Family")
+            TitleWithRightIcon(leftIcon = Icons.Rounded.Groups, title = "Family"){ onClick.invoke()}
             Spacer(modifier = Modifier.height(spacing.extraLarge))
             LeftRightInfoView("Father", model.fatherName)
             Spacer(modifier = Modifier.height(spacing.medium))

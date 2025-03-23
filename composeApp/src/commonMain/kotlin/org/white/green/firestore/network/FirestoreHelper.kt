@@ -27,7 +27,7 @@ object FirestoreHelper {
      * Fetch data from Firestore and deserialize into the given type.
      */
     suspend inline fun fetchFromFirestore(collection: String): Result<DocumentSnapshot> {
-        Firebase.firestore
+
         val userID =
             Firebase.auth.currentUser?.uid
                 ?: return Result.failure(Exception("User not logged in while fetch $collection"))

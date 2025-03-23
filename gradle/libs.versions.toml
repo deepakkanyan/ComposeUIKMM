@@ -1,4 +1,5 @@
 [versions]
+
 agp = "8.5.2"
 android-compileSdk = "35"
 android-minSdk = "24"
@@ -10,6 +11,7 @@ androidx-lifecycle = "2.8.4"
 androidx-test-junit = "1.2.1"
 compose-multiplatform = "1.7.0"
 junit = "4.13.2"
+koinAndroid = "3.5.0"
 koinCompose = "4.0.2"
 koinCore = "4.0.2"
 kotlin = "2.1.10"
@@ -18,13 +20,18 @@ kotlinxDatetime = "0.6.0"
 kotlinxSerializationJson = "1.8.0"
 materialIcons = "1.7.3"
 gitlive = "2.1.0"
-firebase-bom = "33.10.0"
+firebase-bom = "33.11.0"
 navigationCompose = "2.8.0-alpha10"
+
+#Just Android
 uiToolingPreview = "1.7.0"
+accompanistPermissions = "0.29.2-rc"
 
 [libraries]
 
+androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-activityCompose" }
 jetbrains-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndroid" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koinCompose" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }
@@ -47,6 +54,8 @@ gitlive-firebase-firestore = {  group = "dev.gitlive", name = "firebase-firestor
 gitlive-firebase-auth = {  group = "dev.gitlive", name = "firebase-auth", version.ref = "gitlive" }
 gitlive-firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "gitlive" }
 
+# Android Specific
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 firebase-bom = {  group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 

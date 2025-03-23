@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.white.green.designSystem.ui.ui_state.UIState
+import org.white.green.designSystem.ui.ui_state.handleException
 import org.white.green.profile.ui.basicProfile.BasicProfileModel
 import org.white.green.profile.ui.basicProfile.BasicProfileRepository
 import org.white.green.profile.ui.family.FamilyInfoModel
@@ -36,14 +37,14 @@ class ProfileViewModel(
         fetchFamily()
     }
 
-    private fun fetchProfile() {
+     fun fetchProfile() {
         viewModelScope.launch {
             _profileState.value = UIState.Loading
             try {
                 val profileData = profileRepo.fetch()
                 _profileState.value = UIState.Success(profileData.getOrThrow())
             } catch (e: Exception) {
-                _profileState.value = UIState.Error(e.message ?: "Unknown error")
+                _profileState.value = handleException(e)
             }
         }
     }
@@ -54,7 +55,7 @@ class ProfileViewModel(
                 val profileData = personalRepo.fetchPreferences()
                 _preferencesState.value = UIState.Success(profileData.getOrThrow())
             } catch (e: Exception) {
-                   _preferencesState.value = UIState.Error(e.message ?: "Unknown error")
+                _preferencesState.value = handleException(e)
             }
         }
     }
@@ -65,8 +66,7 @@ class ProfileViewModel(
                 val profileData = familyRepo.fetch()
                 _familyState.value = UIState.Success(profileData.getOrThrow())
             } catch (e: Exception) {
-                println(e.message)
-                _familyState.value = UIState.Error(e.message ?: "Unknown error")
+                _familyState.value = handleException(e)
             }
         }
     }
