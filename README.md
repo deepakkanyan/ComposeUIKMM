@@ -1,4 +1,4 @@
-# **ComposeUI KMM Project**
+# **ComposeUI CMP Project**
 
 Welcome to **ComposeUI KMM**, a **Kotlin Multiplatform (KMM)** project that seamlessly integrates with **Firebase** to provide a robust, cross-platform experience for **Android** and **iOS** using **Jetpack Compose Multiplatform**. This project ensures maximum code reusability while leveraging platform-specific capabilities where needed.
 
