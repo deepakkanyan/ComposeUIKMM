@@ -13,13 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PhotoPickerScreen() {
+fun PhotoPickerScreen(onClick :() -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
         Button(onClick = {
-
+            onClick.invoke()
         }) {
             Text("Pick an Image ")
         }

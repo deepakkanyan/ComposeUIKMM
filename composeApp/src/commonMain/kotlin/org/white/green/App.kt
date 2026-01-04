@@ -1,6 +1,7 @@
 package org.white.green
 
 import WhiteGreenTheme
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,16 +35,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
-import org.white.green.chat.ChatUI
-import org.white.green.login.CreateAccountScreen
-import org.white.green.login.LoginScreen
-import org.white.green.login.UserViewModel
-import org.white.green.match.MatchUI
-import org.white.green.profile.ProfileUI
-import org.white.green.profile.ui.basicProfile.BasicProfileForm
-import org.white.green.profile.ui.family.FamilyForm
-import org.white.green.profile.ui.personal.PreferencesForm
-import spacing
+import org.white.green.feature.chat.ChatUI
+import org.white.green.feature.login.CreateAccountScreen
+import org.white.green.feature.login.LoginScreen
+import org.white.green.feature.login.UserViewModel
+import org.white.green.feature.match.MatchUI
+import org.white.green.feature.profile.ProfileUI
+import org.white.green.feature.profile.ui.basicProfile.BasicProfileForm
+import org.white.green.feature.profile.ui.family.FamilyForm
+import org.white.green.feature.profile.ui.personal.PreferencesForm
 
 @Composable
 fun App() {
@@ -87,6 +87,7 @@ fun TopNavigationBar(navController: NavHostController) {
     val bottomNavRoutes = listOf(
         AppRoute.MainProfileDashboard.route,
         AppRoute.Chat.route,
+        AppRoute.MatchUI.route,
         AppRoute.ProfileBasicInfo.route,
         AppRoute.LogInRoute.route
     )
@@ -116,7 +117,7 @@ fun TopNavigationBar(navController: NavHostController) {
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         BottomNavItem(Strings.chat, Icons.Filled.ChatBubble, AppRoute.Chat.route),
-        BottomNavItem(Strings.match, Icons.Filled.Favorite, AppRoute.ColorUI.route),
+        BottomNavItem(Strings.match, Icons.Filled.Favorite, AppRoute.MatchUI.route),
         BottomNavItem(Strings.profile, Icons.Filled.AccountCircle, AppRoute.ProfileBasicInfo.route),
     )
     val currentRoute = currentRoute(navController)
@@ -142,7 +143,6 @@ fun AppNavHost(
     NavHost(
         navController = navController,
         startDestination = AppRoute.LogInRoute.route,
-        modifier = Modifier.padding(spacing.large)
     ) {
         composable(AppRoute.SignIn.route) { CreateAccountScreen(viewModel = UserViewModel()) }
         composable(AppRoute.LogInRoute.route) {
@@ -158,7 +158,7 @@ fun AppNavHost(
         }
         composable(AppRoute.Chat.route) { ChatUI() }
         profileComposable(appStartupViewModel, navController)
-        composable(AppRoute.ColorUI.route) { MatchUI() }
+        composable(AppRoute.MatchUI.route) { MatchUI() }
     }
 }
 
@@ -193,7 +193,7 @@ fun currentRoute(navController: NavHostController): String? {
 
 fun navigateToRoute(navController: NavHostController, route: String) {
     navController.navigate(route) {
-        popUpTo(navController.graph.startDestinationId) { saveState = true }
+        popUpTo(navController.graph.startDestinationRoute ?: "") { saveState = true }
         launchSingleTop = true
         restoreState = true
     }

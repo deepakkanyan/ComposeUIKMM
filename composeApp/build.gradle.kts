@@ -29,7 +29,10 @@ kotlin {
             isStatic = true
         }
     }
+    jvm("desktop")
+
     sourceSets {
+        val desktopMain by getting
 
         androidMain.dependencies {
             implementation(compose.preview)
@@ -38,8 +41,7 @@ kotlin {
             implementation(libs.accompanist.permissions)
             implementation(libs.koin.android) // Ensure this is added
             implementation(libs.androidx.activity)
-
-
+            implementation(libs.ktor.client.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -71,6 +73,21 @@ kotlin {
             //Datetime
             implementation(libs.kotlinx.datetime)
 
+            //PhotoPicker
+//            implementation(libs.peekaboo.ui)
+//            implementation(libs.peekaboo.image.picker)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
+        }
+
+        iosMain.dependencies{
+            implementation(libs.ktor.client.darwin)
+        }
+
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutinesSwing)
+            implementation("dev.gitlive:firebase-firestore-jvm:2.4.0")
         }
     }
 }

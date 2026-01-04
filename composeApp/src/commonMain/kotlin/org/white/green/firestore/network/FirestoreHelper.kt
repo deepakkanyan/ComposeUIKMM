@@ -4,6 +4,8 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.DocumentSnapshot
 import dev.gitlive.firebase.firestore.firestore
+import dev.gitlive.firebase.storage.Data
+import dev.gitlive.firebase.storage.storage
 
 object FirestoreHelper {
 
@@ -42,6 +44,21 @@ object FirestoreHelper {
 
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    suspend fun uploadImageToFirebase(byteArray: ByteArray, fileName: String): String? {
+        return try {
+            // Reference to the storage path (e.g., "images/userId/filename.jpg")
+            val storageRef = Firebase.storage.reference.child("images/$fileName")
+            // Upload ByteArray
+            storageRef.putData(byteArray as Data)
+            // Get the download URL
+            val downloadUrl = storageRef.getDownloadUrl()
+            downloadUrl
+        } catch (e: Exception) {
+            println("Error uploading image: ${e.message}")
+            null
         }
     }
 }

@@ -1,6 +1,6 @@
 [versions]
 
-agp = "8.5.2"
+agp = "8.10.1"
 android-compileSdk = "35"
 android-minSdk = "24"
 android-targetSdk = "35"
@@ -14,7 +14,7 @@ junit = "4.13.2"
 koinAndroid = "3.5.0"
 koinCompose = "4.0.2"
 koinCore = "4.0.2"
-kotlin = "2.1.10"
+kotlin = "2.2.21"
 kotlinxCoroutinesCore = "1.10.1"
 kotlinxDatetime = "0.6.0"
 kotlinxSerializationJson = "1.8.0"
@@ -26,6 +26,14 @@ navigationCompose = "2.8.0-alpha10"
 #Just Android
 uiToolingPreview = "1.7.0"
 accompanistPermissions = "0.29.2-rc"
+composeHotReload = "v1.0.0-alpha11"
+
+# Photopicker
+peekaboo = "0.5.2"
+coil = "3.0.4"
+ktor = "3.1.0"
+kotlinx-coroutines = "1.10.2"
+
 
 [libraries]
 
@@ -48,6 +56,15 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 material-icons = { module = "org.jetbrains.compose.material3:material3", version.ref = "materialIcons" }
+peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekaboo" }
+peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekaboo" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+
+
 
 #gitlive
 gitlive-firebase-firestore = {  group = "dev.gitlive", name = "firebase-firestore", version.ref = "gitlive" }
@@ -68,3 +85,4 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload"}

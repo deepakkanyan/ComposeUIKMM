@@ -4,7 +4,7 @@ fun Int.toFeetAndInches(): String {
     val totalInches = (this / 2.54).toInt() // Convert cm to inches
     val feet = totalInches / 12
     val inches = totalInches % 12
-    return "$feet,$inches'"
+    return "${feet}ft,$inches' In"
 }
 
 

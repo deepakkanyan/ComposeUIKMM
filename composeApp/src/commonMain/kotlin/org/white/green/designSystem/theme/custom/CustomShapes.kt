@@ -15,7 +15,8 @@ data class Spacing(
 
     val dimenPoint5: Dp = (0.5).dp,
     val dimen1: Dp = 1.dp,
-    val dimen32: Dp = 32.dp
+    val dimen32: Dp = 32.dp,
+    val dimen80: Dp = 80.dp
 )
 
 // Default Spacing Values

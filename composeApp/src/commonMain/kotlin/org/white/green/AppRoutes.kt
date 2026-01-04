@@ -29,6 +29,8 @@ sealed class AppRoute(val route: String) {
     data object ProfileEditInfo : AppRoute("basic_profile_info")
     @Serializable
     data object ColorUI : AppRoute("color_ui")
+    @Serializable
+    data object MatchUI : AppRoute("match_ui")
 
     companion object {
         fun getRouteTitle(route: String): String {
@@ -45,6 +47,7 @@ sealed class AppRoute(val route: String) {
                 ProfileEditFamily.route -> "Edit Family Information"
                 ProfileEditInfo.route -> "Edit Profile"
                 ColorUI.route -> "Colors"
+                MatchUI.route -> "Match"
                 else -> "Unknown"
             }
         }

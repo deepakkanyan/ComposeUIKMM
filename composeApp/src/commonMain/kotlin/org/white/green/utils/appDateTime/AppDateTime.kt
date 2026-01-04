@@ -31,6 +31,6 @@ object AppDateTime {
             .toLocalDateTime(TimeZone.currentSystemDefault()).date
 
         val age = currentDate.year - birthDate.year
-        return "$age Y"
+        return "$age Yrs"
     }
 }
